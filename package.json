@@ -1,0 +1,33 @@
+{
+  "name": "bankapp",
+  "version": "1.0.0",
+  "description": " Backend API for loan system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js --harmony",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharooq15/bankApp.git"
+  },
+  "author": "sharooq",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sharooq15/bankApp/issues"
+  },
+  "homepage": "https://github.com/sharooq15/bankApp#readme",
+  "dependencies": {
+    "aws-sdk": "^2.813.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "nconf": "^0.11.0",
+    "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0"
+  }
+}
