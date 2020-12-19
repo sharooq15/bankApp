@@ -2,9 +2,10 @@ import http from 'http';
 import nconf from 'nconf';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import attachRoutes from './src/server/routes';
 import * as middleware from './src/server/middleware';
-import authenticateJWT from './src/server/middleware/auth';
+import {
+  userCtrl,
+} from './src/server/controllers';
 
 nconf.argv().env().file({
   file: `${process.cwd()}/config.json`,
@@ -21,11 +22,7 @@ app.use(cookieParser());
 app.use([middleware.rawBodyParser, middleware.encodedBodyParser, middleware.jsonBodyParser]);
 
 // attaching routes
-app.get('/books', authenticateJWT, (req, res) => {
-  res.json('sharppq');
-});
-
-// attachRoutes(app);
+app.post('/user/signup', (req, res) => userCtrl.userSignup(req, res));
 
 // error handling
 app.use(middleware.errorHandler);

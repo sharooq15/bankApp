@@ -12,16 +12,16 @@ const generateUUID = () => UUIDv4();
 
 const generatePasswordHash = async (password) => {
   const saltRounds = 10;
-  const hash = await bcrypt.hash(password, saltRounds).promise();
+  const hash = await bcrypt.hash(password, saltRounds);
   return hash;
 };
 
 const validatePassword = async (password, hash) => {
-  const status = await bcrypt.compare(password, hash).promise();
+  const status = await bcrypt.compare(password, hash);
   return status;
 };
 
-const generateAccessToken = (username) => jwt.sign(username, accessTokenSecret, { expiresIn: '1800s' });
+const generateAccessToken = (input) => jwt.sign(input, accessTokenSecret, { expiresIn: '1800s' });
 
 export {
   generateUUID,

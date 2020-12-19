@@ -9,6 +9,9 @@ import {
   internalServerError,
   tableNames,
 } from '../../common';
+import {
+  getAssignableCRM,
+} from './staff-ctrl';
 /*
 The userSignup Function creates a new user in usertable and
 returns a token which will be valid for 30 minutes
@@ -22,7 +25,9 @@ const userSignup = async (req, res) => {
         password,
       },
     } = req;
-    const hash = generatePasswordHash(password);
+    console.log('inside userSignup', username, password);
+    const hash = await generatePasswordHash(password);
+    console.log('hash', hash);
     const input = {
       id: generateUUID(),
       un: username,
@@ -32,8 +37,10 @@ const userSignup = async (req, res) => {
       TableName: tableNames.USER,
       Item: input,
     };
+    console.log('params', params);
     await docClient.put(params).promise();
-    const token = generateAccessToken({ username: req.body.username });
+    const token = generateAccessToken({ name: req.body.username, access: 'User' });
+    console.log('token', token);
     res.send({ token });
   } catch (e) {
     console.log('Error Creating user record', e);
@@ -48,10 +55,17 @@ const userLogin = async (req, res) => {
       password,
     },
   } = req;
-  // TODO: Get username and password hash from db
+  const params = {
+    TableName: tableNames.USER,
+    FilterExpression: 'un = :un',
+    ExpressionAttributeValues: {
+      ':un': username,
+    },
+  };
+  const [Items] = await docClient.scan(params).promise();
   try {
-    if (validatePassword(password, hash)) {
-      const token = generateAccessToken(username);
+    if (validatePassword(password, Items.password)) {
+      const token = generateAccessToken({ name: req.body.username, access: 'User' });
       res.send({ token });
     } else {
       res.send('Invalid password');
@@ -66,11 +80,8 @@ const createLoanRequest = (req, res) => {
 
 };
 
-
-
 export {
   userSignup,
   userLogin,
   createLoanRequest,
-  viewLoanStatus,
 };
