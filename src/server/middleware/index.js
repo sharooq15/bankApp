@@ -4,9 +4,9 @@ import {
   encodedBodyParser,
   errorHandler,
 } from './parser';
+
 import {
   authenticateJWT,
-  generateAccessToken,
 } from './auth';
 
 export {
@@ -15,5 +15,4 @@ export {
   encodedBodyParser,
   jsonBodyParser,
   rawBodyParser,
-  generateAccessToken,
 };

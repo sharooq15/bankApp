@@ -2,7 +2,13 @@ import http from 'http';
 import nconf from 'nconf';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import * as middleware from './src/server/middleware';
+import {
+  rawBodyParser,
+  encodedBodyParser,
+  jsonBodyParser,
+  errorHandler,
+  authenticateJWT,
+} from './src/server/middleware';
 import {
   userCtrl,
 } from './src/server/controllers';
@@ -19,13 +25,19 @@ const port = process.env.PORT || nconf.get('port');
 
 // attaching middlewares
 app.use(cookieParser());
-app.use([middleware.rawBodyParser, middleware.encodedBodyParser, middleware.jsonBodyParser]);
+app.use([rawBodyParser, encodedBodyParser, jsonBodyParser]);
 
-// attaching routes
-app.post('/user/signup', (req, res) => userCtrl.userSignup(req, res));
+// attaching routes for user
+app.post('/user/signup',
+  (req, res) => userCtrl.userSignup(req, res));
+app.post('/user/login',
+  (req, res) => userCtrl.userLogin(req, res));
+app.post('/user/loan-request',
+  authenticateJWT,
+  (req, res) => userCtrl.createLoanRequest(req, res));
 
 // error handling
-app.use(middleware.errorHandler);
+app.use(errorHandler);
 
 // create http server
 const httpServer = http.createServer(app);

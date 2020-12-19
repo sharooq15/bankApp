@@ -4,6 +4,8 @@ import {
   generatePasswordHash,
   generateAccessToken,
   validatePassword,
+  getPayloadData,
+  getTokenFromAuthHeader,
 } from '../../api-utils';
 import {
   internalServerError,
@@ -25,9 +27,7 @@ const userSignup = async (req, res) => {
         password,
       },
     } = req;
-    console.log('inside userSignup', username, password);
     const hash = await generatePasswordHash(password);
-    console.log('hash', hash);
     const input = {
       id: generateUUID(),
       un: username,
@@ -37,12 +37,11 @@ const userSignup = async (req, res) => {
       TableName: tableNames.USER,
       Item: input,
     };
-    console.log('params', params);
     await docClient.put(params).promise();
     const token = generateAccessToken({ name: req.body.username, access: 'User' });
-    console.log('token', token);
     res.send({ token });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log('Error Creating user record', e);
     res.send(internalServerError);
   }
@@ -62,10 +61,16 @@ const userLogin = async (req, res) => {
       ':un': username,
     },
   };
-  const [Items] = await docClient.scan(params).promise();
+  const { Items } = await docClient.scan(params).promise();
   try {
-    if (validatePassword(password, Items.password)) {
-      const token = generateAccessToken({ name: req.body.username, access: 'User' });
+    const isCorrectPassword = await validatePassword(password, Items[0].pw);
+    if (isCorrectPassword) {
+      const input = {
+        sub: username,
+        iss: 'user/loan-request',
+        scope: 'USER',
+      };
+      const token = generateAccessToken(input);
       res.send({ token });
     } else {
       res.send('Invalid password');
@@ -77,7 +82,12 @@ const userLogin = async (req, res) => {
 };
 
 const createLoanRequest = (req, res) => {
-
+  const {
+    headers: { authorization: authHeader },
+  } = req;
+  const token = getTokenFromAuthHeader(authHeader);
+  const payload = getPayloadData(token);
+  console.log('payload', payload);
 };
 
 export {

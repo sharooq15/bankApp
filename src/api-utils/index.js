@@ -4,6 +4,8 @@ import {
   generatePasswordHash,
   validatePassword,
   generateAccessToken,
+  getPayloadData,
+  getTokenFromAuthHeader,
 } from './api-utils';
 
 export {
@@ -12,4 +14,6 @@ export {
   generatePasswordHash,
   validatePassword,
   generateAccessToken,
+  getPayloadData,
+  getTokenFromAuthHeader,
 };

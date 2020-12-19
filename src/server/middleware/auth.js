@@ -1,21 +1,26 @@
-import jwt from 'jsonwebtoken';
+import njwt from 'njwt';
+import {
+  getTokenFromAuthHeader,
+} from '../../api-utils';
 import {
   accessTokenSecret,
 } from '../../common';
 
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
-    jwt.verify(token, accessTokenSecret, (err) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
+const authenticateJWT = async (req, res, next) => {
+  const {
+    headers: {
+      authorization: authHeader,
+    },
+  } = req;
+  try {
+    const token = getTokenFromAuthHeader(authHeader);
+    const isValidToken = await njwt.verify(token, accessTokenSecret);
+    if (isValidToken) {
       next();
-    });
-  } else {
+    } else {
+      res.send(403);
+    }
+  } catch (e) {
     res.send(401);
   }
 };

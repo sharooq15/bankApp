@@ -1,7 +1,9 @@
 import { v4 as UUIDv4 } from 'uuid';
 import AWS from 'aws-sdk';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import njwt from 'njwt';
+// eslint-disable-next-line camelcase
+import jwt_decode from 'jwt-decode';
 import awsConfig from '../../aws-config';
 import { accessTokenSecret } from '../common';
 
@@ -21,7 +23,14 @@ const validatePassword = async (password, hash) => {
   return status;
 };
 
-const generateAccessToken = (input) => jwt.sign(input, accessTokenSecret, { expiresIn: '1800s' });
+const generateAccessToken = (input) => njwt.create(input, accessTokenSecret).compact();
+
+const getPayloadData = (token) => {
+  console.log('inside payloddata', getPayloadData);
+  return jwt_decode(token, { header: false });
+};
+
+const getTokenFromAuthHeader = (authHeader) => authHeader.split(' ')[1];
 
 export {
   generateUUID,
@@ -29,4 +38,6 @@ export {
   generatePasswordHash,
   validatePassword,
   generateAccessToken,
+  getPayloadData,
+  getTokenFromAuthHeader,
 };
