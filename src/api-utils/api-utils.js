@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import awsConfig from '../../aws-config';
+import { accessTokenSecret } from '../common';
 
 AWS.config.update(awsConfig);
 const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
