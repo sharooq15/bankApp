@@ -2,7 +2,7 @@ import { v4 as UUIDv4 } from 'uuid';
 import AWS from 'aws-sdk';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import awsConfig from '../common/aws-config';
+import awsConfig from '../../aws-config';
 
 AWS.config.update(awsConfig);
 const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
