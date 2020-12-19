@@ -1,6 +1,7 @@
 import { v4 as UUIDv4 } from 'uuid';
 import AWS from 'aws-sdk';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import awsConfig from '../common/aws-config';
 
 AWS.config.update(awsConfig);
@@ -14,4 +15,17 @@ const generatePasswordHash = async (password) => {
   return hash;
 };
 
-export { generateUUID, docClient, generatePasswordHash };
+const validatePassword = async (password, hash) => {
+  const status = await bcrypt.compare(password, hash).promise();
+  return status;
+};
+
+const generateAccessToken = (username) => jwt.sign(username, accessTokenSecret, { expiresIn: '1800s' });
+
+export {
+  generateUUID,
+  docClient,
+  generatePasswordHash,
+  validatePassword,
+  generateAccessToken,
+};

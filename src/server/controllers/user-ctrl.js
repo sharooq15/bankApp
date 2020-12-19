@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
 import {
   generateUUID,
   docClient,
   generatePasswordHash,
+  generateAccessToken,
+  validatePassword,
 } from '../../api-utils';
 import {
   internalServerError,
@@ -12,9 +13,6 @@ import {
 The userSignup Function creates a new user in usertable and
 returns a token which will be valid for 30 minutes
 */
-const dummyun = 'username';
-const dummypw = 'pw';
-const accessTokenSecret = 'ats';
 
 const userSignup = async (req, res) => {
   try {
@@ -34,23 +32,47 @@ const userSignup = async (req, res) => {
       TableName: tableNames.USER,
       Item: input,
     };
-    // await docClient.put(params).promise();
-    if (username === dummyun && password === dummypw) {
-      const accessToken = jwt.sign({ username }, accessTokenSecret, {
-        expiresIn: '20m',
-      });
-      res.send({
-        accessToken,
-      });
-    } else {
-      res.send('wrong username and password');
-    }
+    await docClient.put(params).promise();
+    const token = generateAccessToken({ username: req.body.username });
+    res.send({ token });
   } catch (e) {
     console.log('Error Creating user record', e);
     res.send(internalServerError);
   }
 };
 
+const userLogin = async (req, res) => {
+  const {
+    body: {
+      username,
+      password,
+    },
+  } = req;
+  // TODO: Get username and password hash from db
+  try {
+    if (validatePassword(password, hash)) {
+      const token = generateAccessToken(username);
+      res.send({ token });
+    } else {
+      res.send('Invalid password');
+    }
+  } catch (e) {
+    console.log('Error getting user object');
+    res.send('Invalid username');
+  }
+};
+
+const createLoanRequest = (req, res) => {
+
+};
+
+const viewLoanStatus = (req, res) => {
+
+};
+
 export {
   userSignup,
+  userLogin,
+  createLoanRequest,
+  viewLoanStatus,
 };

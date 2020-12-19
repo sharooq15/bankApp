@@ -20,4 +20,6 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
-export default authenticateJWT;
+export {
+  authenticateJWT,
+};
