@@ -66,9 +66,7 @@ const createLoanRequest = (req, res) => {
 
 };
 
-const viewLoanStatus = (req, res) => {
 
-};
 
 export {
   userSignup,
