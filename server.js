@@ -10,6 +10,7 @@ import {
 } from './src/server/middleware';
 import {
   userCtrl,
+  staffCtrl,
 } from './src/server/controllers';
 
 nconf.argv().env().file({
@@ -33,6 +34,13 @@ app.post('/user/login',
 app.post('/user/loan-request',
   authenticateJWT,
   (req, res) => userCtrl.createLoanRequest(req, res));
+
+// attaching routes for staffs
+app.post('/staff/login',
+  (req, res) => staffCtrl.staffLogin(req, res));
+app.get('/staff/view-requests',
+  authenticateJWT,
+  (req, res) => staffCtrl.viewLoanRequests(req, res));
 
 // error handling
 app.use(errorHandler);

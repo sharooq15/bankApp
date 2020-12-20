@@ -1,13 +1,12 @@
 import {
-  generateUUID,
   docClient,
-  generatePasswordHash,
   generateAccessToken,
   validatePassword,
   getPayloadData,
   getTokenFromAuthHeader,
+  transformLoanListToLoanDetails,
 } from '../../api-utils';
-import { internalServerError, tableNames, forbidden } from '../../common';
+import { tableNames, internalServerError } from '../../common';
 
 /*
 Create Staff API was used to create the staff inside the staff table.
@@ -56,12 +55,69 @@ const getAssignableCRM = async () => {
   return assignableCRM;
 };
 
-const staffLogin = (req, res) => {
-  // staff login
+const staffLogin = async (req, res) => {
+  const {
+    body: { username, password },
+  } = req;
+  const params = {
+    TableName: tableNames.STAFF,
+    FilterExpression: 'un = :un',
+    ExpressionAttributeValues: {
+      ':un': username,
+    },
+  };
+  const { Items } = await docClient.scan(params).promise();
+  try {
+    const {
+      pw: hashedPassword,
+      id: staffId,
+      d: designation,
+    } = Items[0];
+    const isCorrectPassword = await validatePassword(password, hashedPassword);
+    if (isCorrectPassword) {
+      const input = {
+        sub: username,
+        empId: staffId,
+        iss: 'staff/loan-request',
+        scope: designation,
+      };
+      const token = generateAccessToken(input);
+      res.send({ token });
+    } else {
+      res.send('Invalid password');
+    }
+  } catch (e) {
+    console.log('Error getting staff object', e);
+    res.send('Invalid username');
+  }
+};
+
+const viewLoanRequests = async (req, res) => {
+  try {
+    const {
+      headers: { authorization: authHeader },
+    } = req;
+    const token = getTokenFromAuthHeader(authHeader);
+    const { empId, scope } = getPayloadData(token);
+    const params = {
+      TableName: tableNames.LOAN,
+    };
+    if (scope === 'CRM') {
+      params.FilterExpression = 'cId = :cId';
+      params.ExpressionAttributeValues = {
+        ':cId': empId,
+      };
+    }
+    const { Items: loanList } = await docClient.scan(params).promise();
+    res.send(transformLoanListToLoanDetails(loanList));
+  } catch (e) {
+    console.log('Error getting loan requests', e);
+    res.send(internalServerError);
+  }
 };
 
 const actOnLoanRequest = (req, res) => {
-  // logic to act on loans
+  
 };
 
 export {
@@ -69,4 +125,5 @@ export {
   staffLogin,
   actOnLoanRequest,
   incrementLoanRequestAssigned,
+  viewLoanRequests,
 };

@@ -2,18 +2,13 @@ import {
   generateUUID,
   docClient,
 } from '../../api-utils';
+
 import {
   getAssignableCRM,
   incrementLoanRequestAssigned,
 } from './staff-ctrl';
+
 import { tableNames } from '../../common';
-
-const getLoanList = (req, res) => {
-  // Logic to return complete loan lst for branch manager
-  // and return only specific list for crms
-};
-
-const viewLoanStatus = (req, res) => {};
 
 const handleLoanRequest = async (loanAmount, username) => {
   try {
@@ -43,7 +38,5 @@ const handleLoanRequest = async (loanAmount, username) => {
 };
 
 export {
-  getLoanList,
-  viewLoanStatus,
   handleLoanRequest,
 };

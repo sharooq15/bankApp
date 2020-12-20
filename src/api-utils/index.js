@@ -6,6 +6,7 @@ import {
   generateAccessToken,
   getPayloadData,
   getTokenFromAuthHeader,
+  transformLoanListToLoanDetails,
 } from './api-utils';
 
 export {
@@ -16,4 +17,5 @@ export {
   generateAccessToken,
   getPayloadData,
   getTokenFromAuthHeader,
+  transformLoanListToLoanDetails,
 };

@@ -29,6 +29,16 @@ const getPayloadData = (token) => jwt_decode(token, { header: false });
 
 const getTokenFromAuthHeader = (authHeader) => authHeader.split(' ')[1];
 
+const transformLoanListToLoanDetails = (loanList) => {
+  const loanDetails = loanList.map((loan) => ({
+    id: loan.id,
+    assignedCRM: loan.cId,
+    loanAmount: loan.lA,
+    status: loan.st,
+  }));
+  return loanDetails;
+};
+
 export {
   generateUUID,
   docClient,
@@ -37,4 +47,5 @@ export {
   generateAccessToken,
   getPayloadData,
   getTokenFromAuthHeader,
+  transformLoanListToLoanDetails,
 };
