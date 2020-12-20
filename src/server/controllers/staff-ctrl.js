@@ -126,7 +126,6 @@ const actOnLoanRequest = async (req, res) => {
       headers: { authorization: authHeader },
       body: { status, loanId },
     } = req;
-    console.log('status', status);
     const token = getTokenFromAuthHeader(authHeader);
     const { scope } = getPayloadData(token);
     const params = {

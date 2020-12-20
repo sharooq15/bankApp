@@ -35,8 +35,10 @@ const handleLoanRequest = async (loanAmount, username) => {
   } catch (e) {
     console.log('Error creating Loan Request', e);
   }
+  return {};
 };
 
 export {
+  // eslint-disable-next-line import/prefer-default-export
   handleLoanRequest,
 };

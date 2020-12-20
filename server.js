@@ -35,12 +35,33 @@ app.post('/user/signup',
   (req, res) => userCtrl.userSignup(req, res));
 app.post('/user/login',
   (req, res) => userCtrl.userLogin(req, res));
+
+/*
+While creating a new loan request it will create a new event
+which will be caught in server to notify the CRM
+*/
+
 app.post('/user/loan-request',
   authenticateJWT,
-  (req, res) => userCtrl.createLoanRequest(req, res));
+  (req, res) => {
+    io.on('connection', (socket) => {
+      socket.emit('New Loan Request', req);
+    });
+    return userCtrl.createLoanRequest(req, res);
+  });
 app.get('/user/view-requests',
   authenticateJWT,
   (req, res) => userCtrl.viewLoanRequestStatuses(req, res));
+
+/*
+TODO: NotifyAssigned CRM is not implemented yet, but when an event is emitted from client
+to this particular socket it catch and trigger that particular
+api for notifying the CRM accordingly
+*/
+
+io.sockets.on('connection', (socket) => {
+  socket.on('New Loan Request', 'notifyAssignedCRM(req, res)');
+});
 
 // attaching routes for staffs
 app.post('/staff/login',
@@ -50,12 +71,7 @@ app.get('/staff/view-requests',
   (req, res) => staffCtrl.viewLoanRequests(req, res));
 app.post('/staff/act-on-request',
   authenticateJWT,
-  (req, res) => {
-    io.sockets.on('connection', (socket) => {
-      socket.emit('server message', 'Loan Status Changed');
-    });
-    return staffCtrl.actOnLoanRequest(req, res);
-  });
+  (req, res) => staffCtrl.actOnLoanRequest(req, res));
 
 // error handling
 app.use(errorHandler);

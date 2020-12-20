@@ -5,5 +5,6 @@ const tableNames = {
 };
 
 export {
+  // eslint-disable-next-line import/prefer-default-export
   tableNames,
 };
