@@ -23,6 +23,10 @@ const host = nconf.get('host') || 'localhost';
 const protocol = nconf.get('protocol') || 'http';
 const port = process.env.PORT || nconf.get('port');
 
+// create http server
+const httpServer = http.createServer(app);
+const io = require('socket.io').listen(httpServer);
+
 // attaching middlewares
 app.use([rawBodyParser, encodedBodyParser, jsonBodyParser]);
 
@@ -46,13 +50,15 @@ app.get('/staff/view-requests',
   (req, res) => staffCtrl.viewLoanRequests(req, res));
 app.post('/staff/act-on-request',
   authenticateJWT,
-  (req, res) => staffCtrl.actOnLoanRequest(req, res));
+  (req, res) => {
+    io.sockets.on('connection', (socket) => {
+      socket.emit('server message', 'Loan Status Changed');
+    });
+    return staffCtrl.actOnLoanRequest(req, res);
+  });
 
 // error handling
 app.use(errorHandler);
-
-// create http server
-const httpServer = http.createServer(app);
 
 // start server
 httpServer.listen(port, () => {
