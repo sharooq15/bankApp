@@ -18,7 +18,7 @@ const encodedBodyParser = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res) => {
-  res.status(500).json({
+  res.send(500).json({
     status: err.response.status,
     statusText: err.response.data.Message,
     details: err.response.data.MessageDetail,

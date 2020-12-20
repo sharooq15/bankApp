@@ -6,7 +6,11 @@ import {
   getTokenFromAuthHeader,
   transformLoanListToLoanDetails,
 } from '../../api-utils';
-import { tableNames, internalServerError } from '../../common';
+import {
+  tableNames,
+  internalServerError,
+  forbidden,
+} from '../../common';
 
 /*
 Create Staff API was used to create the staff inside the staff table.
@@ -116,8 +120,41 @@ const viewLoanRequests = async (req, res) => {
   }
 };
 
-const actOnLoanRequest = (req, res) => {
-  
+const actOnLoanRequest = async (req, res) => {
+  try {
+    const {
+      headers: { authorization: authHeader },
+      body: { status, loanId },
+    } = req;
+    console.log('status', status);
+    const token = getTokenFromAuthHeader(authHeader);
+    const { scope } = getPayloadData(token);
+    const params = {
+      TableName: tableNames.LOAN,
+      Key: {
+        id: loanId,
+      },
+      ReturnValues: 'UPDATED_NEW',
+    };
+    if (scope === 'CRM') {
+      params.UpdateExpression = 'SET st1 = :st1';
+      params.ExpressionAttributeValues = {
+        ':st1': status,
+      };
+    } else if (scope === 'BRANCH_MANAGER') {
+      params.UpdateExpression = 'SET st2 = :st2';
+      params.ExpressionAttributeValues = {
+        ':st2': status,
+      };
+    } else {
+      res.send(forbidden);
+    }
+    await docClient.update(params).promise();
+    res.send('success');
+  } catch (e) {
+    console.log('Error Updating Loan Status', e);
+    res.send(internalServerError);
+  }
 };
 
 export {

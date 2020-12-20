@@ -6,6 +6,7 @@ import {
   validatePassword,
   getPayloadData,
   getTokenFromAuthHeader,
+  transformLoanListToLoanDetails,
 } from '../../api-utils';
 import {
   internalServerError,
@@ -83,18 +84,50 @@ const userLogin = async (req, res) => {
 };
 
 const createLoanRequest = async (req, res) => {
-  const {
-    headers: { authorization: authHeader },
-    body: { loanAmount },
-  } = req;
-  const token = getTokenFromAuthHeader(authHeader);
-  const payload = getPayloadData(token);
-  const { sub: username, scope } = payload;
-  if (scope === 'USER') {
-    const loanRequestDetails = await handleLoanRequest(loanAmount, username);
-    res.send(loanRequestDetails);
-  } else {
-    res.send(forbidden);
+  try {
+    const {
+      headers: { authorization: authHeader },
+      body: { loanAmount },
+    } = req;
+    const token = getTokenFromAuthHeader(authHeader);
+    const payload = getPayloadData(token);
+    const { sub: username, scope } = payload;
+    if (scope === 'USER') {
+      const loanRequestDetails = await handleLoanRequest(loanAmount, username);
+      res.send(loanRequestDetails);
+    } else {
+      res.send(forbidden);
+    }
+  } catch (e) {
+    console.log('Error Creating Loan Request', e);
+    res.send(internalServerError);
+  }
+};
+
+const viewLoanRequestStatuses = async (req, res) => {
+  try {
+    const {
+      headers: { authorization: authHeader },
+    } = req;
+    const token = getTokenFromAuthHeader(authHeader);
+    const payload = getPayloadData(token);
+    const { sub: username, scope } = payload;
+    if (scope === 'USER') {
+      const params = {
+        TableName: tableNames.LOAN,
+        FilterExpression: 'un = :un',
+        ExpressionAttributeValues: {
+          ':un': username,
+        },
+      };
+      const { Items: loanList } = await docClient.scan(params).promise();
+      res.send(transformLoanListToLoanDetails(loanList));
+    } else {
+      res.send(forbidden);
+    }
+  } catch (e) {
+    console.log('Error Getting Loan Request Status', e);
+    res.send(internalServerError);
   }
 };
 
@@ -102,4 +135,5 @@ export {
   userSignup,
   userLogin,
   createLoanRequest,
+  viewLoanRequestStatuses,
 };

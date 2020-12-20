@@ -34,7 +34,8 @@ const transformLoanListToLoanDetails = (loanList) => {
     id: loan.id,
     assignedCRM: loan.cId,
     loanAmount: loan.lA,
-    status: loan.st,
+    statusLevel1: loan.st1 || 'PENDING',
+    statusLevel2: loan.st2 || 'PENDING',
   }));
   return loanDetails;
 };

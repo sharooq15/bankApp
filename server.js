@@ -34,6 +34,9 @@ app.post('/user/login',
 app.post('/user/loan-request',
   authenticateJWT,
   (req, res) => userCtrl.createLoanRequest(req, res));
+app.get('/user/view-requests',
+  authenticateJWT,
+  (req, res) => userCtrl.viewLoanRequestStatuses(req, res));
 
 // attaching routes for staffs
 app.post('/staff/login',
@@ -41,6 +44,9 @@ app.post('/staff/login',
 app.get('/staff/view-requests',
   authenticateJWT,
   (req, res) => staffCtrl.viewLoanRequests(req, res));
+app.post('/staff/act-on-request',
+  authenticateJWT,
+  (req, res) => staffCtrl.actOnLoanRequest(req, res));
 
 // error handling
 app.use(errorHandler);
