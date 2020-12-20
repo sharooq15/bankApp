@@ -10,10 +10,11 @@ import {
 import {
   internalServerError,
   tableNames,
+  forbidden,
 } from '../../common';
 import {
-  getAssignableCRM,
-} from './staff-ctrl';
+  handleLoanRequest,
+} from './loan-ctrl';
 /*
 The userSignup Function creates a new user in usertable and
 returns a token which will be valid for 30 minutes
@@ -81,13 +82,20 @@ const userLogin = async (req, res) => {
   }
 };
 
-const createLoanRequest = (req, res) => {
+const createLoanRequest = async (req, res) => {
   const {
     headers: { authorization: authHeader },
+    body: { loanAmount },
   } = req;
   const token = getTokenFromAuthHeader(authHeader);
   const payload = getPayloadData(token);
-  console.log('payload', payload);
+  const { sub: username, scope } = payload;
+  if (scope === 'USER') {
+    const loanRequestDetails = await handleLoanRequest(loanAmount, username);
+    res.send(loanRequestDetails);
+  } else {
+    res.send(forbidden);
+  }
 };
 
 export {

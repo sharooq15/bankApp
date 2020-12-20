@@ -21,7 +21,6 @@
     "aws-sdk": "^2.813.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "jwt-decode": "^3.1.2",
     "nconf": "^0.11.0",

@@ -4,6 +4,8 @@ import {
 
 import {
   internalServerError,
+  forbidden,
+  unauthorized,
 } from './server-error';
 
 import {
@@ -14,4 +16,6 @@ export {
   internalServerError,
   tableNames,
   accessTokenSecret,
+  forbidden,
+  unauthorized,
 };

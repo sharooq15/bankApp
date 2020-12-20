@@ -25,10 +25,7 @@ const validatePassword = async (password, hash) => {
 
 const generateAccessToken = (input) => njwt.create(input, accessTokenSecret).compact();
 
-const getPayloadData = (token) => {
-  console.log('inside payloddata', getPayloadData);
-  return jwt_decode(token, { header: false });
-};
+const getPayloadData = (token) => jwt_decode(token, { header: false });
 
 const getTokenFromAuthHeader = (authHeader) => authHeader.split(' ')[1];
 

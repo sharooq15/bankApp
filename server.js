@@ -1,7 +1,6 @@
 import http from 'http';
 import nconf from 'nconf';
 import express from 'express';
-import cookieParser from 'cookie-parser';
 import {
   rawBodyParser,
   encodedBodyParser,
@@ -24,7 +23,6 @@ const protocol = nconf.get('protocol') || 'http';
 const port = process.env.PORT || nconf.get('port');
 
 // attaching middlewares
-app.use(cookieParser());
 app.use([rawBodyParser, encodedBodyParser, jsonBodyParser]);
 
 // attaching routes for user

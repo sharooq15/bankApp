@@ -4,6 +4,8 @@ import {
 } from '../../api-utils';
 import {
   accessTokenSecret,
+  forbidden,
+  unauthorized,
 } from '../../common';
 
 const authenticateJWT = async (req, res, next) => {
@@ -18,13 +20,14 @@ const authenticateJWT = async (req, res, next) => {
     if (isValidToken) {
       next();
     } else {
-      res.send(403);
+      res.send(forbidden);
     }
   } catch (e) {
-    res.send(401);
+    res.send(unauthorized);
   }
 };
 
 export {
+  // eslint-disable-next-line import/prefer-default-export
   authenticateJWT,
 };
