@@ -29,7 +29,7 @@ const handleLoanRequest = async (loanAmount, username) => {
       loanRequestId: input.id,
       AssignedCRM: {
         id: assignableCRM.id,
-        name: assignableCRM.name,
+        name: assignableCRM.un,
       },
     };
   } catch (e) {

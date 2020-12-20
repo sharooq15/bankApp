@@ -1,6 +1,7 @@
 import http from 'http';
 import nconf from 'nconf';
 import express from 'express';
+import socketio from 'socket.io';
 import {
   rawBodyParser,
   encodedBodyParser,
@@ -25,7 +26,7 @@ const port = process.env.PORT || nconf.get('port');
 
 // create http server
 const httpServer = http.createServer(app);
-const io = require('socket.io').listen(httpServer);
+const io = socketio(httpServer);
 
 // attaching middlewares
 app.use([rawBodyParser, encodedBodyParser, jsonBodyParser]);
